@@ -418,6 +418,24 @@
     card.querySelectorAll('.auto-calorie-button').forEach((button) => {
       button.addEventListener('click', () => estimateCalories(card, button.dataset.meal));
     });
+
+    ['lunch', 'dinner'].forEach((meal) => {
+      const riceToggle = card.querySelector(`[data-field="${meal}RiceIncluded"]`);
+      const menuInput = card.querySelector(`[data-field="${meal}Menu"]`);
+      const calorieInput = card.querySelector(`[data-field="${meal}Calories"]`);
+      const resultEl = card.querySelector(`[data-role="${meal}CalorieResult"]`);
+      riceToggle.addEventListener('change', () => {
+        if (menuInput.value.trim()) {
+          estimateCalories(card, meal, riceToggle.checked ? '밥 포함 기준으로 다시 계산했습니다.' : '밥 제외 기준으로 다시 계산했습니다.');
+          return;
+        }
+        calorieInput.value = '0';
+        resultEl.dataset.details = '[]';
+        resultEl.textContent = riceToggle.checked
+          ? '메뉴 입력 후 자동 추정을 누르면 공기밥 300 kcal가 포함됩니다.'
+          : '밥 제외 상태입니다. 메뉴 입력 후 자동 추정을 눌러주세요.';
+      });
+    });
     return card;
   }
 
@@ -427,11 +445,18 @@
     const price = settings[`${prefix}Price`] || 0;
     const calories = settings[`${prefix}Calories`] || 0;
     const details = settings[`${prefix}CalorieDetails`] || [];
+    const riceIncluded = settings[`${prefix}RiceIncluded`] !== false;
     return `
       <section class="meal-editor ${prefix}">
         <div class="meal-editor-head">
           <strong>${title}</strong>
-          <button type="button" class="auto-calorie-button" data-meal="${prefix}">열량 자동 추정</button>
+          <div class="meal-editor-actions">
+            <label class="rice-option" title="체크하면 공기밥 1인분 300 kcal를 자동으로 포함합니다.">
+              <input type="checkbox" data-field="${prefix}RiceIncluded" ${riceIncluded ? 'checked' : ''}>
+              <span>밥 포함</span>
+            </label>
+            <button type="button" class="auto-calorie-button" data-meal="${prefix}">열량 자동 추정</button>
+          </div>
         </div>
         <textarea data-field="${prefix}Menu" rows="3" placeholder="${title} 메뉴를 / 또는 줄바꿈으로 구분">${escapeHtml(menu)}</textarea>
         <div class="mini-field-grid">
@@ -452,11 +477,12 @@
       </section>`;
   }
 
-  async function estimateCalories(card, meal) {
+  async function estimateCalories(card, meal, completionMessage) {
     const menuInput = card.querySelector(`[data-field="${meal}Menu"]`);
     const calorieInput = card.querySelector(`[data-field="${meal}Calories"]`);
     const resultEl = card.querySelector(`[data-role="${meal}CalorieResult"]`);
     const button = card.querySelector(`.auto-calorie-button[data-meal="${meal}"]`);
+    const riceIncluded = card.querySelector(`[data-field="${meal}RiceIncluded"]`).checked;
     const menu = menuInput.value.trim();
     if (!menu) {
       showToast('메뉴를 먼저 입력해주세요.');
@@ -468,12 +494,13 @@
     try {
       const result = await api.post('admin.estimateCalories', {
         password: state.password,
-        menu
+        menu,
+        includeRice: riceIncluded
       });
       calorieInput.value = formatNumber(result.totalCalories || 0);
       resultEl.dataset.details = JSON.stringify(result.details || []);
       resultEl.textContent = result.summary || calorieSummary(result.details || [], result.totalCalories || 0);
-      showToast(result.usedApi ? '식약처 DB 기준으로 열량을 추정했습니다.' : '내장 기준표로 열량을 추정했습니다.');
+      showToast(completionMessage || (result.usedApi ? '식약처 DB 기준으로 열량을 추정했습니다.' : '내장 기준표로 열량을 추정했습니다.'));
     } catch (error) {
       handleAdminError(error, els.saveMessage);
     } finally {
@@ -542,6 +569,8 @@
       dinnerPrice: parseMoney(value('dinnerPrice').value),
       lunchCalories: parseMoney(value('lunchCalories').value),
       dinnerCalories: parseMoney(value('dinnerCalories').value),
+      lunchRiceIncluded: value('lunchRiceIncluded').checked,
+      dinnerRiceIncluded: value('dinnerRiceIncluded').checked,
       lunchCalorieDetails: safeParseArray(lunchResult.dataset.details),
       dinnerCalorieDetails: safeParseArray(dinnerResult.dataset.details),
       notice: value('notice').value
@@ -616,6 +645,7 @@
       lunchDeadline: '10:30', dinnerDeadline: '16:30',
       lunchPrice: 0, dinnerPrice: 0,
       lunchCalories: 0, dinnerCalories: 0,
+      lunchRiceIncluded: true, dinnerRiceIncluded: true,
       lunchCalorieDetails: [], dinnerCalorieDetails: [],
       notice: '', enabled: true
     };

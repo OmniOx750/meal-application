@@ -213,6 +213,11 @@ button { border: 0; }
 .meal-editor + .meal-editor { margin-top: 10px; }
 .meal-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
 .meal-editor-head strong { font-size: 13px; }
+.meal-editor-actions { display: flex; align-items: center; gap: 7px; }
+.rice-option { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 999px; color: var(--subtext); background: #fff; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; font-size: 10px; font-weight: 800; user-select: none; transition: .2s ease; }
+.rice-option:hover { background: #f0f0f2; }
+.rice-option input { width: 14px; height: 14px; margin: 0; accent-color: var(--blue); cursor: pointer; }
+.rice-option:has(input:checked) { color: var(--blue); background: var(--blue-soft); box-shadow: inset 0 0 0 1px rgba(0,113,227,.12); }
 .auto-calorie-button { padding: 6px 9px; border-radius: 999px; color: var(--blue); background: var(--blue-soft); cursor: pointer; font-size: 10px; font-weight: 800; }
 .auto-calorie-button:disabled { opacity: .45; cursor: wait; }
 .planner-card textarea { min-height: 70px; padding: 11px 12px; resize: none; overflow: hidden; line-height: 1.5; font-size: 12px; }
