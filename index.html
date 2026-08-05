@@ -6,7 +6,13 @@
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="light" name="color-scheme"/>
 <meta content="#f5f5f7" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="식수 신청" name="apple-mobile-web-app-title"/>
 <title>사내 식수 신청</title>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="icons/icon-192.png" rel="apple-touch-icon"/>
 <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="employee-page">
@@ -152,6 +158,25 @@
 <button class="button button-dark identity-button" id="identityButton" type="submit">내 신청 확인</button>
 </form>
 <p class="microcopy">같은 날짜·이름·부서로 저장하면 기존 신청 내용이 수정됩니다.</p>
+</section><section aria-labelledby="appAccessTitle" class="surface app-access-surface">
+<div class="surface-heading compact-heading">
+<div>
+<p class="kicker">APP &amp; REMINDER</p>
+<h2 id="appAccessTitle">앱 설치와 마감 알림</h2>
+</div>
+<span class="identity-state" id="pushState">알림 꺼짐</span>
+</div>
+<div class="app-access-grid">
+<div class="app-access-copy">
+<strong>휴대폰 홈 화면에서 앱처럼 사용하세요.</strong>
+<p>마감 1시간 전까지 중식·석식 신청 여부를 저장하지 않은 경우에만 알림을 보냅니다.</p>
+</div>
+<div class="app-access-actions">
+<button class="button button-secondary" id="installAppButton" type="button">앱 설치</button>
+<button class="button button-dark" id="pushToggleButton" type="button">마감 알림 받기</button>
+</div>
+</div>
+<p class="microcopy" id="pushHelp">신청자 정보를 확인한 뒤 알림을 켤 수 있습니다.</p>
 </section><div class="save-dock" id="saveDock">
 <div>
 <strong id="saveSummary">선택한 날짜의 신청 여부를 확인해주세요.</strong>
@@ -164,6 +189,10 @@
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
+<script src="js/push-config.js"></script>
 <script src="js/app.js"></script>
+<script src="js/push.js"></script>
 </body>
 </html>

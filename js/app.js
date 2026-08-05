@@ -161,6 +161,13 @@
     const ready = state.identityReady && hasIdentity();
     els.identityState.textContent = ready ? '신청자 확인됨' : '정보를 입력해주세요';
     els.identityState.classList.toggle('ready', ready);
+    window.dispatchEvent(new CustomEvent('meal:identity-change', {
+      detail: {
+        ready,
+        name: els.employeeName.value.trim(),
+        department: els.department.value.trim()
+      }
+    }));
   }
 
   function renderDateTabs() {
