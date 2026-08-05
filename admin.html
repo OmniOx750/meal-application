@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>식수 신청 관리자</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="page-shell wide">
+    <header class="hero compact">
+      <div>
+        <p class="eyebrow">ADMIN</p>
+        <h1>식수 신청 관리자</h1>
+        <p class="hero-date">메뉴·마감시간 설정 및 신청 현황</p>
+      </div>
+      <a class="text-link" href="index.html">직원 화면</a>
+    </header>
+
+    <section class="card" id="loginCard">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">관리자 인증</p>
+          <h2>비밀번호를 입력해주세요</h2>
+        </div>
+      </div>
+      <form id="loginForm" class="inline-form">
+        <label class="field grow">
+          <span>관리자 비밀번호</span>
+          <input id="adminPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="button primary" type="submit" id="loginButton">로그인</button>
+      </form>
+      <p class="form-message" id="loginMessage" role="status"></p>
+    </section>
+
+    <div id="adminArea" class="hidden">
+      <section class="toolbar card">
+        <label class="field">
+          <span>관리 날짜</span>
+          <input id="manageDate" type="date">
+        </label>
+        <div class="toolbar-actions">
+          <button class="button ghost" id="todayButton" type="button">오늘</button>
+          <button class="button secondary" id="loadButton" type="button">불러오기</button>
+          <button class="button ghost" id="logoutButton" type="button">로그아웃</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">운영 설정</p>
+            <h2>메뉴와 신청 마감시간</h2>
+          </div>
+          <label class="toggle">
+            <input id="enabled" type="checkbox" checked>
+            <span>신청 사용</span>
+          </label>
+        </div>
+
+        <div class="meal-grid admin-meals">
+          <div class="settings-panel">
+            <h3>중식</h3>
+            <label class="field">
+              <span>중식 메뉴</span>
+              <textarea id="lunchMenu" rows="4" placeholder="예: 제육볶음 / 미역국 / 김치"></textarea>
+            </label>
+            <label class="field">
+              <span>중식 신청 마감</span>
+              <input id="lunchDeadline" type="time" step="60">
+            </label>
+          </div>
+          <div class="settings-panel">
+            <h3>석식</h3>
+            <label class="field">
+              <span>석식 메뉴</span>
+              <textarea id="dinnerMenu" rows="4" placeholder="예: 닭갈비 / 된장국 / 샐러드"></textarea>
+            </label>
+            <label class="field">
+              <span>석식 신청 마감</span>
+              <input id="dinnerDeadline" type="time" step="60">
+            </label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>직원 안내문</span>
+          <textarea id="notice" rows="3" placeholder="예: 오늘 석식은 30분 일찍 마감됩니다."></textarea>
+        </label>
+
+        <div class="action-row">
+          <button class="button primary" id="saveButton" type="button">설정 저장</button>
+          <p class="form-message" id="saveMessage" role="status"></p>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="card stat-card">
+          <p>중식 신청</p>
+          <strong id="lunchApplyCount">0</strong>
+        </article>
+        <article class="card stat-card">
+          <p>중식 미신청</p>
+          <strong id="lunchNoCount">0</strong>
+        </article>
+        <article class="card stat-card">
+          <p>석식 신청</p>
+          <strong id="dinnerApplyCount">0</strong>
+        </article>
+        <article class="card stat-card">
+          <p>석식 미신청</p>
+          <strong id="dinnerNoCount">0</strong>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">신청 현황</p>
+            <h2 id="responseTitle">신청자 목록</h2>
+          </div>
+          <button class="button ghost small" id="refreshButton" type="button">새로고침</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>부서</th>
+                <th>중식</th>
+                <th>석식</th>
+                <th>최종 수정</th>
+              </tr>
+            </thead>
+            <tbody id="responseBody">
+              <tr><td colspan="5" class="empty">데이터를 불러와주세요.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
