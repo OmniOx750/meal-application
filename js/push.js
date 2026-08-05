@@ -45,7 +45,8 @@
 
     if ('serviceWorker' in navigator) {
       try {
-        serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+        serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.2', { scope: './', updateViaCache: 'none' });
+        await serviceWorkerRegistration.update();
       } catch (error) {
         console.error('서비스 워커 등록 실패', error);
         setHelp('앱 설치 기능을 준비하지 못했습니다. 페이지를 새로고침해주세요.');
@@ -107,11 +108,22 @@
     }
 
     if (isIos()) {
-      window.alert('iPhone에서는 Safari의 공유 버튼을 누른 뒤 “홈 화면에 추가”를 선택해주세요. 설치 후 홈 화면 아이콘으로 앱을 열어주세요.');
+      window.alert('iPhone에서는 공유 버튼을 누른 뒤 “홈 화면에 추가”를 선택해주세요. 설치 후 홈 화면 아이콘으로 앱을 열어주세요.');
       return;
     }
 
-    window.alert('Chrome 메뉴에서 “앱 설치” 또는 “홈 화면에 추가”를 선택해주세요.');
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const isChromium = /chrome|crios|edg|samsungbrowser/i.test(navigator.userAgent);
+    if (isAndroid && isChromium) {
+      window.alert('자동 설치 창이 아직 준비되지 않았습니다. 페이지를 한 번 새로고침한 뒤 브라우저 메뉴(⋮)에서 “앱 설치” 또는 “홈 화면에 추가”를 선택해주세요.');
+      return;
+    }
+    if (isAndroid) {
+      window.alert('현재 브라우저에서는 자동 설치가 지원되지 않을 수 있습니다. Chrome에서 이 주소를 연 뒤 메뉴(⋮)의 “앱 설치” 또는 “홈 화면에 추가”를 선택해주세요.');
+      return;
+    }
+
+    window.alert('브라우저 주소창의 설치 아이콘 또는 메뉴에서 “앱 설치”를 선택해주세요.');
   }
 
   async function togglePush() {
@@ -134,7 +146,8 @@
     if (!window.firebase.apps.length) window.firebase.initializeApp(config.firebaseConfig);
     if (!messaging) messaging = window.firebase.messaging();
     if (!serviceWorkerRegistration) {
-      serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+      serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.2', { scope: './', updateViaCache: 'none' });
+      await serviceWorkerRegistration.update();
     }
     return messaging;
   }

@@ -1,6 +1,6 @@
 window.MEAL_PUSH_CONFIG = Object.freeze({
   firebaseConfig: Object.freeze({
-    apiKey: 'AIzaSyCNQYifYFjJ3hKEgjSssQxbXuPX-HjHkyk',
+    apiKey: 'AIzaSyCNQ7ifYFjJ3hKEgjSssQxbXuPx-HjHkyk',
     authDomain: 'mekics-7c6ab.firebaseapp.com',
     projectId: 'mekics-7c6ab',
     storageBucket: 'mekics-7c6ab.firebasestorage.app',

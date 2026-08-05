@@ -2,7 +2,7 @@
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
-const CACHE_NAME = 'mekics-meal-v3-7';
+const CACHE_NAME = 'mekics-meal-v3-7-2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -17,7 +17,7 @@ const APP_SHELL = [
 ];
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCNQYifYFjJ3hKEgjSssQxbXuPX-HjHkyk',
+  apiKey: 'AIzaSyCNQ7ifYFjJ3hKEgjSssQxbXuPx-HjHkyk',
   authDomain: 'mekics-7c6ab.firebaseapp.com',
   projectId: 'mekics-7c6ab',
   storageBucket: 'mekics-7c6ab.firebasestorage.app',
