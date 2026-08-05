@@ -8,12 +8,12 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main class="page-shell wide">
+  <main class="page-shell admin-shell">
     <header class="hero compact">
       <div>
         <p class="eyebrow">ADMIN</p>
         <h1>식수 신청 관리자</h1>
-        <p class="hero-date">메뉴·마감시간 설정 및 신청 현황</p>
+        <p class="hero-date">신청 추이, 식사비용, 주간 메뉴를 한 화면에서 관리합니다.</p>
       </div>
       <a class="text-link" href="index.html">직원 화면</a>
     </header>
@@ -36,67 +36,108 @@
     </section>
 
     <div id="adminArea" class="hidden">
-      <section class="toolbar card">
-        <label class="field">
-          <span>관리 날짜</span>
+      <section class="card dashboard-card">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">DASHBOARD</p>
+            <h2>식수 신청 추이</h2>
+            <p class="section-description" id="dashboardPeriodLabel">-</p>
+          </div>
+
+          <div class="dashboard-controls">
+            <div class="segmented-control" role="tablist" aria-label="대시보드 기간">
+              <button type="button" class="segment" data-dashboard-mode="day" role="tab">일간</button>
+              <button type="button" class="segment active" data-dashboard-mode="week" role="tab">주간</button>
+              <button type="button" class="segment" data-dashboard-mode="month" role="tab">월간</button>
+            </div>
+            <input id="dashboardAnchor" class="compact-date-input" type="date" aria-label="대시보드 기준일">
+            <button class="button ghost small" id="dashboardPreviousButton" type="button">이전</button>
+            <button class="button ghost small" id="dashboardTodayButton" type="button">오늘</button>
+            <button class="button ghost small" id="dashboardNextButton" type="button">다음</button>
+            <button class="button secondary small" id="dashboardRefreshButton" type="button">새로고침</button>
+          </div>
+        </div>
+
+        <div class="dashboard-stats-grid">
+          <article class="dashboard-stat">
+            <span>총 식수</span>
+            <strong id="dashboardTotalMeals">0식</strong>
+          </article>
+          <article class="dashboard-stat">
+            <span>중식 신청</span>
+            <strong id="dashboardLunchMeals">0식</strong>
+          </article>
+          <article class="dashboard-stat">
+            <span>석식 신청</span>
+            <strong id="dashboardDinnerMeals">0식</strong>
+          </article>
+          <article class="dashboard-stat emphasis">
+            <span>예상 총비용</span>
+            <strong id="dashboardTotalCost">0원</strong>
+          </article>
+        </div>
+
+        <div class="chart-panel">
+          <div class="chart-legend" aria-hidden="true">
+            <span><i class="legend-dot lunch"></i>중식</span>
+            <span><i class="legend-dot dinner"></i>석식</span>
+          </div>
+          <div id="trendChart" class="trend-chart" role="img" aria-label="기간별 중식 및 석식 신청 인원 추이">
+            <p class="chart-empty">대시보드를 불러오는 중입니다.</p>
+          </div>
+        </div>
+        <p class="form-message dashboard-message" id="dashboardMessage" role="status"></p>
+      </section>
+
+      <section class="toolbar card week-toolbar">
+        <label class="field week-anchor-field">
+          <span>주간 기준일</span>
           <input id="manageDate" type="date">
         </label>
+
+        <div class="week-range-box" aria-live="polite">
+          <span>관리 주간</span>
+          <strong id="weekRange">-</strong>
+        </div>
+
         <div class="toolbar-actions">
-          <button class="button ghost" id="todayButton" type="button">오늘</button>
+          <button class="button ghost" id="previousWeekButton" type="button">이전 주</button>
+          <button class="button ghost" id="todayButton" type="button">이번 주</button>
+          <button class="button ghost" id="nextWeekButton" type="button">다음 주</button>
           <button class="button secondary" id="loadButton" type="button">불러오기</button>
           <button class="button ghost" id="logoutButton" type="button">로그아웃</button>
         </div>
       </section>
 
-      <section class="card">
-        <div class="section-heading">
+      <section class="card weekly-settings-card">
+        <div class="section-heading weekly-heading">
           <div>
-            <p class="eyebrow">운영 설정</p>
-            <h2>메뉴와 신청 마감시간</h2>
-          </div>
-          <label class="toggle">
-            <input id="enabled" type="checkbox" checked>
-            <span>신청 사용</span>
-          </label>
-        </div>
-
-        <div class="meal-grid admin-meals">
-          <div class="settings-panel">
-            <h3>중식</h3>
-            <label class="field">
-              <span>중식 메뉴</span>
-              <textarea id="lunchMenu" rows="4" placeholder="예: 제육볶음 / 미역국 / 김치"></textarea>
-            </label>
-            <label class="field">
-              <span>중식 신청 마감</span>
-              <input id="lunchDeadline" type="time" step="60">
-            </label>
-          </div>
-          <div class="settings-panel">
-            <h3>석식</h3>
-            <label class="field">
-              <span>석식 메뉴</span>
-              <textarea id="dinnerMenu" rows="4" placeholder="예: 닭갈비 / 된장국 / 샐러드"></textarea>
-            </label>
-            <label class="field">
-              <span>석식 신청 마감</span>
-              <input id="dinnerDeadline" type="time" step="60">
-            </label>
+            <p class="eyebrow">주간 운영 설정</p>
+            <h2>월요일부터 금요일까지 한눈에 관리</h2>
+            <p class="section-description">중식·석식 단가는 별도 저장되며, 중식 단가 입력 시 석식에도 우선 동일하게 반영됩니다.</p>
           </div>
         </div>
 
-        <label class="field">
-          <span>직원 안내문</span>
-          <textarea id="notice" rows="3" placeholder="예: 오늘 석식은 30분 일찍 마감됩니다."></textarea>
-        </label>
+        <div id="weekSettingsBody" class="week-card-grid">
+          <div class="week-loading">주간 설정을 불러오는 중입니다.</div>
+        </div>
 
-        <div class="action-row">
-          <button class="button primary" id="saveButton" type="button">설정 저장</button>
+        <div class="action-row weekly-action-row">
+          <button class="button primary" id="saveWeekButton" type="button">이번 주 전체 저장</button>
           <p class="form-message" id="saveMessage" role="status"></p>
         </div>
       </section>
 
-      <section class="stats-grid">
+      <section class="card selected-day-toolbar">
+        <div>
+          <p class="eyebrow">선택일 신청 현황</p>
+          <h2 id="selectedDayTitle">-</h2>
+          <p class="section-description">요일 카드의 ‘현황 보기’를 누르면 신청자와 예상 식사비가 표시됩니다.</p>
+        </div>
+        <button class="button ghost small" id="refreshButton" type="button">현황 새로고침</button>
+      </section>
+
+      <section class="stats-grid selected-day-stats">
         <article class="card stat-card">
           <p>중식 신청</p>
           <strong id="lunchApplyCount">0</strong>
@@ -113,6 +154,14 @@
           <p>석식 미신청</p>
           <strong id="dinnerNoCount">0</strong>
         </article>
+        <article class="card stat-card total-card">
+          <p>당일 총 식수</p>
+          <strong id="selectedTotalMeals">0식</strong>
+        </article>
+        <article class="card stat-card cost-card">
+          <p>당일 예상 비용</p>
+          <strong id="selectedTotalCost">0원</strong>
+        </article>
       </section>
 
       <section class="card">
@@ -121,7 +170,6 @@
             <p class="eyebrow">신청 현황</p>
             <h2 id="responseTitle">신청자 목록</h2>
           </div>
-          <button class="button ghost small" id="refreshButton" type="button">새로고침</button>
         </div>
         <div class="table-wrap">
           <table>

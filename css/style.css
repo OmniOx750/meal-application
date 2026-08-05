@@ -116,3 +116,180 @@ td.empty { text-align: center; color: var(--muted); padding: 32px; }
   .toolbar-actions { width: 100%; }
   .toolbar-actions .button { flex: 1; }
 }
+
+/* 주간 관리자 화면 */
+.section-description { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.week-toolbar { align-items: flex-end; }
+.week-anchor-field { min-width: 155px; }
+.week-range-box { display: flex; flex-direction: column; gap: 7px; margin-right: auto; padding: 2px 8px; }
+.week-range-box span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.week-range-box strong { font-size: 16px; letter-spacing: -.02em; }
+.weekly-settings-card { padding-bottom: 22px; }
+.weekly-heading { align-items: flex-start; }
+.week-table { width: 100%; }
+.week-table-head,
+.week-day-row {
+  display: grid;
+  grid-template-columns: 128px minmax(240px, 1fr) minmax(240px, 1fr) minmax(190px, .78fr);
+  gap: 12px;
+}
+.week-table-head { padding: 0 14px 9px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.week-settings-body { display: grid; gap: 10px; }
+.week-loading { padding: 36px 18px; border-radius: 16px; background: var(--surface-alt); color: var(--muted); text-align: center; font-weight: 700; }
+.week-loading.error { color: #b91c1c; }
+.week-day-row { padding: 12px; border: 1px solid var(--line); border-radius: 17px; background: #fff; transition: border-color .2s, box-shadow .2s, background .2s; }
+.week-day-row.selected { border-color: rgba(37, 99, 235, .62); background: #fbfdff; box-shadow: 0 0 0 3px rgba(37, 99, 235, .08); }
+.week-day-cell { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; min-width: 0; }
+.week-day-selector { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; padding: 8px 9px; border: 0; border-radius: 12px; background: transparent; color: var(--text); text-align: left; }
+.week-day-selector:hover { background: #eff6ff; }
+.week-day-selector strong { font-size: 17px; letter-spacing: -.03em; }
+.week-day-selector span { color: var(--muted); font-size: 11px; }
+.week-day-selector small { margin-top: 4px; color: var(--primary); font-size: 11px; font-weight: 800; }
+.compact-toggle { padding: 0 9px 7px; font-size: 13px; }
+.week-meal-cell,
+.week-notice-cell { min-width: 0; padding: 11px; border-radius: 13px; background: var(--surface-alt); }
+.week-meal-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.week-meal-heading strong { font-size: 13px; }
+.auto-grow-textarea { overflow: hidden !important; resize: none !important; }
+.week-menu-input,
+.week-notice-input {
+  display: block;
+  width: 100%;
+  min-height: 86px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 10px 11px;
+  background: #fff;
+  color: var(--text);
+  line-height: 1.48;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.week-menu-input:focus,
+.week-notice-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .1); }
+.compact-deadline { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 800; }
+.compact-deadline input { width: 120px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 9px; background: #fff; color: var(--text); outline: none; }
+.compact-deadline input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .1); }
+.compact-field { gap: 7px; }
+.mobile-column-label { display: none; }
+.weekly-action-row { position: sticky; bottom: 12px; z-index: 5; margin: 16px -6px -6px; padding: 12px; border: 1px solid rgba(226, 232, 240, .92); border-radius: 15px; background: rgba(255, 255, 255, .94); box-shadow: 0 10px 28px rgba(15, 23, 42, .09); backdrop-filter: blur(12px); }
+.selected-day-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 18px; }
+.selected-day-toolbar h2 { margin: 4px 0 0; }
+
+@media (max-width: 1080px) {
+  .week-table-head { display: none; }
+  .week-day-row { grid-template-columns: 145px minmax(0, 1fr) minmax(0, 1fr); }
+  .week-notice-cell { grid-column: 2 / -1; }
+  .mobile-column-label { display: block; }
+}
+
+@media (max-width: 760px) {
+  .week-toolbar { align-items: stretch; }
+  .week-range-box { margin: 0; padding: 0; }
+  .week-day-row { grid-template-columns: 1fr; }
+  .week-day-cell { flex-direction: row; align-items: center; }
+  .week-day-selector { width: auto; flex: 1; }
+  .week-notice-cell { grid-column: auto; }
+  .weekly-action-row { position: static; margin: 16px 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+  .weekly-action-row .button { width: 100%; }
+  .selected-day-toolbar { align-items: stretch; flex-direction: column; }
+}
+
+/* 관리자 대시보드 + 5일 카드형 주간 관리 */
+.admin-shell { width: min(1660px, calc(100% - 36px)); }
+.dashboard-card { margin-bottom: 18px; }
+.dashboard-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.dashboard-heading h2 { margin: 4px 0 0; letter-spacing: -.025em; }
+.dashboard-controls { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.segmented-control { display: inline-flex; padding: 4px; border-radius: 12px; background: #eef2f7; }
+.segment { min-height: 34px; border: 0; border-radius: 9px; padding: 0 13px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 800; }
+.segment.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(15, 23, 42, .08); }
+.compact-date-input { min-height: 38px; border: 1px solid var(--line); border-radius: 11px; padding: 0 10px; background: #fff; color: var(--text); font-weight: 700; }
+.dashboard-stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.dashboard-stat { min-width: 0; padding: 15px 17px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-alt); }
+.dashboard-stat span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.dashboard-stat strong { display: block; overflow: hidden; text-overflow: ellipsis; font-size: clamp(22px, 2vw, 31px); letter-spacing: -.035em; white-space: nowrap; }
+.dashboard-stat.emphasis { border-color: #bfdbfe; background: #eff6ff; }
+.dashboard-stat.emphasis strong { color: var(--primary); }
+.chart-panel { position: relative; min-height: 260px; border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px 6px; background: #fff; }
+.chart-legend { display: flex; justify-content: flex-end; gap: 16px; min-height: 22px; padding: 0 8px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+.legend-dot.lunch { background: #2563eb; }
+.legend-dot.dinner { background: #f59e0b; }
+.trend-chart { min-height: 218px; display: grid; place-items: center; overflow: hidden; }
+.trend-svg { display: block; width: 100%; height: 218px; overflow: visible; }
+.chart-grid-line { stroke: #e8edf4; stroke-width: 1; }
+.chart-axis-label { fill: #8290a4; font-size: 11px; font-weight: 700; }
+.chart-axis-label.x-label { font-size: 10px; }
+.chart-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.lunch-line { stroke: #2563eb; }
+.dinner-line { stroke: #f59e0b; }
+.chart-point { stroke: #fff; stroke-width: 2; }
+.lunch-point { fill: #2563eb; }
+.dinner-point { fill: #f59e0b; }
+.chart-empty { margin: 0; color: var(--muted); font-size: 14px; font-weight: 700; }
+.dashboard-message { margin-bottom: -8px; }
+
+.week-card-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: start; }
+.week-card-grid > .week-loading { grid-column: 1 / -1; }
+.week-day-card { min-width: 0; border: 1px solid var(--line); border-radius: 18px; padding: 12px; background: #fff; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.week-day-card.selected { border-color: rgba(37, 99, 235, .62); box-shadow: 0 0 0 3px rgba(37, 99, 235, .08); }
+.day-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+.day-card-title { flex: 1; min-width: 0; border: 0; border-radius: 11px; padding: 7px 8px; background: transparent; color: var(--text); text-align: left; }
+.day-card-title:hover { background: #eff6ff; }
+.day-card-title strong { display: block; font-size: 17px; letter-spacing: -.03em; }
+.day-card-title span { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+.day-card-title small { display: block; margin-top: 4px; color: var(--primary); font-size: 10px; font-weight: 800; }
+.compact-toggle { flex: 0 0 auto; padding: 8px 2px 0 0; font-size: 12px; }
+.compact-toggle input { width: 16px; height: 16px; }
+.compact-meal-section { margin-top: 8px; padding: 10px; border-radius: 14px; background: var(--surface-alt); }
+.compact-meal-section.lunch { border-top: 3px solid #93c5fd; }
+.compact-meal-section.dinner { border-top: 3px solid #fcd34d; }
+.compact-meal-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.compact-meal-title strong { font-size: 13px; }
+.compact-menu-input,
+.day-notice-field textarea { width: 100%; overflow: hidden !important; resize: none !important; border: 1px solid var(--line); border-radius: 10px; padding: 8px 9px; background: #fff; color: var(--text); font-size: 12px; line-height: 1.45; outline: none; transition: border-color .2s, box-shadow .2s; }
+.compact-menu-input:focus,
+.day-notice-field textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .1); }
+.meal-mini-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 7px; }
+.meal-mini-controls label { min-width: 0; color: var(--muted); font-size: 10px; font-weight: 800; }
+.meal-mini-controls label > span { display: block; margin-bottom: 4px; }
+.meal-mini-controls input { width: 100%; min-height: 34px; border: 1px solid var(--line); border-radius: 9px; padding: 0 7px; background: #fff; color: var(--text); font-size: 12px; outline: none; }
+.meal-mini-controls input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, .1); }
+.day-notice-field { display: block; margin-top: 8px; }
+.day-notice-field > span { display: block; margin: 0 0 5px 2px; color: var(--muted); font-size: 10px; font-weight: 800; }
+.day-cost-summary { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 9px 10px; border-radius: 11px; background: #172033; color: #fff; }
+.day-cost-summary span { color: #cbd5e1; font-size: 10px; font-weight: 700; }
+.day-cost-summary strong { font-size: 12px; text-align: right; }
+.selected-day-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.selected-day-stats .total-card { background: #f8fafc; }
+.selected-day-stats .cost-card { border-color: #bfdbfe; background: #eff6ff; }
+.selected-day-stats .cost-card strong { color: var(--primary); font-size: 25px; }
+.selected-day-stats .total-card strong { font-size: 27px; }
+
+@media (max-width: 1380px) {
+  .admin-shell { width: min(1280px, calc(100% - 30px)); }
+  .week-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .selected-day-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 980px) {
+  .dashboard-heading { flex-direction: column; }
+  .dashboard-controls { justify-content: flex-start; width: 100%; }
+  .dashboard-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .week-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .admin-shell { width: min(100% - 20px, 720px); }
+  .dashboard-controls { align-items: stretch; }
+  .segmented-control { width: 100%; }
+  .segment { flex: 1; }
+  .compact-date-input { width: 100%; }
+  .dashboard-controls .button { flex: 1; }
+  .week-card-grid { grid-template-columns: 1fr; }
+  .selected-day-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trend-svg { height: 190px; }
+  .chart-panel { min-height: 230px; }
+}
