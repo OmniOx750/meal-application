@@ -9,7 +9,8 @@
     days: new Map(),
     selectedDate: '',
     loading: false,
-    dashboardCollapsed: localStorage.getItem('mealDashboardCollapsed') === 'true'
+    dashboardCollapsed: localStorage.getItem('mealDashboardCollapsed') === 'true',
+    dashboardData: null
   };
 
   const els = {
@@ -36,6 +37,7 @@
     dashboardMessage: document.getElementById('dashboardMessage'),
     dashboardContent: document.getElementById('dashboardContent'),
     dashboardCollapseButton: document.getElementById('dashboardCollapseButton'),
+    downloadSummaryCsvButton: document.getElementById('downloadSummaryCsvButton'),
     manageDate: document.getElementById('manageDate'),
     previousWeekButton: document.getElementById('previousWeekButton'),
     nextWeekButton: document.getElementById('nextWeekButton'),
@@ -44,7 +46,6 @@
     weekRange: document.getElementById('weekRange'),
     weekSettingsBody: document.getElementById('weekSettingsBody'),
     saveWeekButton: document.getElementById('saveWeekButton'),
-    downloadWeekCsvButton: document.getElementById('downloadWeekCsvButton'),
     saveMessage: document.getElementById('saveMessage'),
     selectedDayTitle: document.getElementById('selectedDayTitle'),
     selectedDayMenus: document.getElementById('selectedDayMenus'),
@@ -55,7 +56,8 @@
     openRosterButton: document.getElementById('openRosterButton'),
     rosterModal: document.getElementById('rosterModal'),
     closeRosterButton: document.getElementById('closeRosterButton'),
-    downloadDayCsvButton: document.getElementById('downloadDayCsvButton'),
+    downloadRosterWeekCsvButton: document.getElementById('downloadRosterWeekCsvButton'),
+    downloadRosterMonthCsvButton: document.getElementById('downloadRosterMonthCsvButton'),
     rosterTitle: document.getElementById('rosterTitle'),
     rosterSubtitle: document.getElementById('rosterSubtitle'),
     rosterLunchSummary: document.getElementById('rosterLunchSummary'),
@@ -76,6 +78,7 @@
     loadDashboard();
   });
   els.dashboardCollapseButton.addEventListener('click', toggleDashboard);
+  els.downloadSummaryCsvButton.addEventListener('click', downloadDashboardSummaryCsv);
   els.manageDate.addEventListener('change', loadWeek);
   els.previousWeekButton.addEventListener('click', () => moveWeek(-7));
   els.nextWeekButton.addEventListener('click', () => moveWeek(7));
@@ -90,9 +93,9 @@
     loadWeek();
   });
   els.saveWeekButton.addEventListener('click', saveWeek);
-  els.downloadWeekCsvButton.addEventListener('click', downloadSelectedWeekCsv);
   els.openRosterButton.addEventListener('click', openRoster);
-  els.downloadDayCsvButton.addEventListener('click', downloadSelectedDayCsv);
+  els.downloadRosterWeekCsvButton.addEventListener('click', () => downloadRosterPeriodCsv('week', els.downloadRosterWeekCsvButton));
+  els.downloadRosterMonthCsvButton.addEventListener('click', () => downloadRosterPeriodCsv('month', els.downloadRosterMonthCsvButton));
   els.closeRosterButton.addEventListener('click', closeRoster);
   els.rosterModal.addEventListener('click', (event) => {
     if (event.target === els.rosterModal) closeRoster();
@@ -105,6 +108,7 @@
   els.dashboardAnchor.value = today;
   els.manageDate.value = today;
   applyDashboardCollapsedState();
+  updateSummaryExportButton();
 
   if (state.password) {
     verifyStoredPassword();
@@ -174,7 +178,9 @@
 
   function applyDashboardCollapsedState() {
     const collapsed = Boolean(state.dashboardCollapsed);
-    els.dashboardContent.classList.toggle('collapsed', collapsed);
+    // max-height 애니메이션 대신 hidden 속성을 사용해 브라우저/캐시 상태와 관계없이 확실하게 접습니다.
+    els.dashboardContent.hidden = collapsed;
+    els.dashboardContent.classList.toggle('is-collapsed', collapsed);
     els.dashboardCollapseButton.textContent = collapsed ? '대시보드 펼치기' : '대시보드 접기';
     els.dashboardCollapseButton.setAttribute('aria-expanded', String(!collapsed));
   }
@@ -183,6 +189,7 @@
     const button = event.target.closest('[data-mode]');
     if (!button) return;
     state.dashboardMode = button.dataset.mode;
+    updateSummaryExportButton();
     els.dashboardMode.querySelectorAll('[data-mode]').forEach((item) => {
       item.classList.toggle('active', item === button);
     });
@@ -206,6 +213,8 @@
   }
 
   function renderDashboard(data) {
+    state.dashboardData = data || null;
+    updateSummaryExportButton();
     const summary = data.summary || {};
     els.dashboardPeriodLabel.textContent = data.periodLabel || '-';
     els.dashboardTotalMeals.textContent = `${formatNumber(summary.totalMeals)}식`;
@@ -214,6 +223,12 @@
     els.dashboardTotalCost.textContent = `${formatNumber(summary.totalCost)}원`;
     els.dashboardAverage.textContent = `일평균 ${formatNumber(summary.dailyAverage || 0)}식`;
     renderTrendChart(data.series || []);
+  }
+
+  function updateSummaryExportButton() {
+    const exportable = state.dashboardMode === 'week' || state.dashboardMode === 'month';
+    els.downloadSummaryCsvButton.hidden = !exportable;
+    els.downloadSummaryCsvButton.textContent = state.dashboardMode === 'month' ? '월간 요약 CSV' : '주간 요약 CSV';
   }
 
   function renderTrendChart(series) {
@@ -648,68 +663,65 @@
     return `<span class="table-status ${apply ? 'apply' : 'no'}">${escapeHtml(value || '미선택')}</span>`;
   }
 
-  function downloadSelectedWeekCsv() {
-    if (!state.weekDates.length) {
-      showToast('주간 데이터를 먼저 불러와주세요.');
+  function downloadDashboardSummaryCsv() {
+    const data = state.dashboardData;
+    if (!data || (data.mode !== 'week' && data.mode !== 'month')) {
+      showToast('주간 또는 월간 대시보드를 먼저 불러와주세요.');
       return;
     }
 
-    const rows = [];
-    state.weekDates.forEach((date) => {
-      const data = state.days.get(date) || {};
-      const settings = data.settings || defaultSettings(date);
-      const responses = Array.isArray(data.responses) ? data.responses : [];
-      responses.forEach((item) => rows.push(buildCsvRow(date, settings, item)));
+    const rows = (data.series || []).map((item) => ({
+      '날짜': item.date || '',
+      '요일': formatDayTitle(item.date || ''),
+      '총 식수': Number(item.total || 0),
+      '중식 신청': Number(item.lunch || 0),
+      '석식 신청': Number(item.dinner || 0),
+      '예상 총비용': Number(item.totalCost || 0)
+    }));
+    const summary = data.summary || {};
+    rows.push({
+      '날짜': '합계',
+      '요일': data.periodLabel || '',
+      '총 식수': Number(summary.totalMeals || 0),
+      '중식 신청': Number(summary.lunchApply || 0),
+      '석식 신청': Number(summary.dinnerApply || 0),
+      '예상 총비용': Number(summary.totalCost || 0)
     });
 
-    const startDate = state.weekDates[0];
-    const endDate = state.weekDates[state.weekDates.length - 1];
-    downloadCsv(rows, `식수신청_${startDate}_${endDate}.csv`);
-    showToast(`${formatNumber(rows.length)}건의 신청자 명단을 CSV로 저장했습니다.`);
+    const periodName = data.mode === 'month' ? '월간' : '주간';
+    downloadCsv(
+      ['날짜', '요일', '총 식수', '중식 신청', '석식 신청', '예상 총비용'],
+      rows,
+      `식수요약_${periodName}_${data.startDate}_${data.endDate}.csv`
+    );
+    showToast(`${periodName} 식수 요약 CSV를 저장했습니다.`);
   }
 
-  function downloadSelectedDayCsv() {
-    const data = state.days.get(state.selectedDate);
-    if (!data) {
-      showToast('선택한 날짜의 데이터를 찾을 수 없습니다.');
-      return;
+  async function downloadRosterPeriodCsv(mode, button) {
+    const anchorDate = state.selectedDate || els.manageDate.value || todayString();
+    const originalLabel = mode === 'month' ? '월간 명단 CSV' : '주간 명단 CSV';
+    setButtonBusy(button, true, '준비 중');
+    try {
+      const data = await api.post('admin.getPeriodExport', {
+        password: state.password,
+        mode,
+        anchorDate
+      });
+      const rows = Array.isArray(data.applicantRows) ? data.applicantRows : [];
+      downloadCsv(
+        ['날짜', '요일', '이름', '부서', '중식 신청', '석식 신청', '개인 예상 비용', '최종 수정'],
+        rows,
+        `신청자명단_${mode === 'month' ? '월간' : '주간'}_${data.startDate}_${data.endDate}.csv`
+      );
+      showToast(`${data.periodLabel || ''} 신청자 명단 ${formatNumber(rows.length)}건을 저장했습니다.`);
+    } catch (error) {
+      handleAdminError(error, els.saveMessage);
+    } finally {
+      setButtonBusy(button, false, originalLabel);
     }
-    const settings = data.settings || defaultSettings(state.selectedDate);
-    const responses = Array.isArray(data.responses) ? data.responses : [];
-    const rows = responses.map((item) => buildCsvRow(state.selectedDate, settings, item));
-    downloadCsv(rows, `식수신청_${state.selectedDate}.csv`);
-    showToast(`${formatNumber(rows.length)}건의 신청자 명단을 CSV로 저장했습니다.`);
   }
 
-  function buildCsvRow(date, settings, item) {
-    const lunchApplied = item.lunch === '신청';
-    const dinnerApplied = item.dinner === '신청';
-    const lunchPrice = Number(settings.lunchPrice || 0);
-    const dinnerPrice = Number(settings.dinnerPrice || 0);
-    return {
-      '날짜': date,
-      '요일': formatDayTitle(date),
-      '이름': item.name || '',
-      '부서': item.department || '',
-      '중식 신청': item.lunch || '미선택',
-      '석식 신청': item.dinner || '미선택',
-      '중식 메뉴': settings.lunchMenu || '',
-      '석식 메뉴': settings.dinnerMenu || '',
-      '중식 예상 kcal': Number(settings.lunchCalories || 0),
-      '석식 예상 kcal': Number(settings.dinnerCalories || 0),
-      '중식 단가': lunchPrice,
-      '석식 단가': dinnerPrice,
-      '개인 예상 비용': (lunchApplied ? lunchPrice : 0) + (dinnerApplied ? dinnerPrice : 0),
-      '최종 수정': item.updatedAt || ''
-    };
-  }
-
-  function downloadCsv(rows, filename) {
-    const headers = [
-      '날짜', '요일', '이름', '부서', '중식 신청', '석식 신청',
-      '중식 메뉴', '석식 메뉴', '중식 예상 kcal', '석식 예상 kcal',
-      '중식 단가', '석식 단가', '개인 예상 비용', '최종 수정'
-    ];
+  function downloadCsv(headers, rows, filename) {
     const lines = [headers.map(csvEscape).join(',')];
     rows.forEach((row) => {
       lines.push(headers.map((header) => csvEscape(row[header])).join(','));
