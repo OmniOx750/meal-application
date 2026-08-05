@@ -1,181 +1,169 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f5f5f7">
-  <title>사내 식수 신청</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="light" name="color-scheme"/>
+<meta content="#f5f5f7" name="theme-color"/>
+<title>사내 식수 신청</title>
+<link href="css/style.css" rel="stylesheet"/>
 </head>
 <body class="employee-page">
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="index.html" aria-label="식수 신청 홈">
-        <span class="brand-mark" aria-hidden="true">M</span>
-        <span>
-          <strong id="companyName">멕아이씨에스</strong>
-          <small>Meal Service</small>
-        </span>
-      </a>
-      <a class="nav-link" href="admin.html">관리자</a>
-    </div>
-  </header>
+<header class="topbar">
+<div class="topbar-inner">
+<a aria-label="식수 신청 홈" class="brand" href="index.html">
+<span aria-hidden="true" class="brand-mark">M</span>
+<span>
+<strong id="companyName">멕아이씨에스</strong>
+<small>Meal Service</small>
+</span>
+</a>
+<a class="nav-link" href="admin.html">관리자</a>
+</div>
+</header>
+<main class="app-frame employee-frame">
+<section class="page-intro">
+<div>
+<p class="kicker">MEAL APPLICATION</p>
+<h1 id="appTitle">사내 식수 신청</h1>
+<p>어제 신청 내역을 확인하고, 오늘과 내일 식사를 미리 신청할 수 있습니다.</p>
+</div>
+<div aria-live="polite" class="live-clock">
+<span>현재 시간</span>
+<strong id="currentTime">--:--</strong>
+</div>
+</section>
 
-  <main class="app-frame employee-frame">
-    <section class="page-intro">
-      <div>
-        <p class="kicker">MEAL APPLICATION</p>
-        <h1 id="appTitle">사내 식수 신청</h1>
-        <p>어제 신청 내역을 확인하고, 오늘과 내일 식사를 미리 신청할 수 있습니다.</p>
-      </div>
-      <div class="live-clock" aria-live="polite">
-        <span>현재 시간</span>
-        <strong id="currentTime">--:--</strong>
-      </div>
-    </section>
+<section aria-label="신청 날짜 선택" class="date-switcher-wrap">
+<div class="date-switcher" id="dateTabs" role="tablist">
+<button class="date-tab" disabled="" type="button"><span>어제</span><strong>--</strong></button>
+<button class="date-tab active" disabled="" type="button"><span>오늘</span><strong>--</strong></button>
+<button class="date-tab" disabled="" type="button"><span>내일</span><strong>--</strong></button>
+</div>
+</section>
+<section class="surface loading-panel" id="loadingPanel">
+<span aria-hidden="true" class="spinner"></span>
+<div>
+<strong>식수 정보를 불러오는 중입니다.</strong>
+<p>잠시만 기다려주세요.</p>
+</div>
+</section>
+<section class="hidden" id="dayArea">
+<div class="day-heading-row">
+<div>
+<p class="kicker" id="relativeLabel">오늘</p>
+<h2 id="selectedDateTitle">-</h2>
+<p id="selectedDateDescription">-</p>
+</div>
+<span class="status-badge neutral" id="submissionBadge">신청 내역 없음</span>
+</div>
+<section class="inline-alert hidden" id="dayAlert" role="status"></section>
+<form id="mealForm" novalidate="">
+<div class="meal-card-grid">
+<article class="meal-panel" id="lunchCard">
+<div class="meal-panel-head">
+<div>
+<span aria-hidden="true" class="meal-symbol lunch-symbol">L</span>
+<div>
+<p class="kicker">LUNCH</p>
+<h3>중식</h3>
+</div>
+</div>
+<span class="status-badge neutral" id="lunchState">확인 중</span>
+</div>
+<div class="menu-display">
+<span>오늘의 메뉴</span>
+<strong id="lunchMenu">-</strong>
+</div>
+<div class="meal-meta-row">
+<span id="lunchDeadline">마감시간 -</span>
+<span class="calorie-chip hidden" id="lunchCalories">예상 열량 -</span>
+</div>
+<div class="calorie-detail hidden" id="lunchCalorieDetail"></div>
+<fieldset class="choice-segment" id="lunchChoices">
+<legend class="sr-only">중식 신청 여부</legend>
+<label>
+<input name="lunch" type="radio" value="신청"/>
+<span>신청</span>
+</label>
+<label>
+<input name="lunch" type="radio" value="미신청"/>
+<span>미신청</span>
+</label>
+</fieldset>
+</article>
+<article class="meal-panel" id="dinnerCard">
+<div class="meal-panel-head">
+<div>
+<span aria-hidden="true" class="meal-symbol dinner-symbol">D</span>
+<div>
+<p class="kicker">DINNER</p>
+<h3>석식</h3>
+</div>
+</div>
+<span class="status-badge neutral" id="dinnerState">확인 중</span>
+</div>
+<div class="menu-display">
+<span>오늘의 메뉴</span>
+<strong id="dinnerMenu">-</strong>
+</div>
+<div class="meal-meta-row">
+<span id="dinnerDeadline">마감시간 -</span>
+<span class="calorie-chip hidden" id="dinnerCalories">예상 열량 -</span>
+</div>
+<div class="calorie-detail hidden" id="dinnerCalorieDetail"></div>
+<fieldset class="choice-segment" id="dinnerChoices">
+<legend class="sr-only">석식 신청 여부</legend>
+<label>
+<input name="dinner" type="radio" value="신청"/>
+<span>신청</span>
+</label>
+<label>
+<input name="dinner" type="radio" value="미신청"/>
+<span>미신청</span>
+</label>
+</fieldset>
+</article>
+</div>
+<section class="notice-panel hidden" id="noticePanel">
+<span aria-hidden="true">i</span>
+<p id="noticeText"></p>
+</section>
+<p class="nutrition-note">예상 열량은 표준 1인분 기준이며 실제 조리법과 배식량에 따라 달라질 수 있습니다.</p>
 
-    <section class="surface identity-surface" aria-labelledby="identityTitle">
-      <div class="surface-heading compact-heading">
-        <div>
-          <p class="kicker">신청자 정보</p>
-          <h2 id="identityTitle">이름과 부서</h2>
-        </div>
-        <span class="identity-state" id="identityState">정보를 입력해주세요</span>
-      </div>
-      <form id="identityForm" class="identity-form" novalidate>
-        <label class="field-control">
-          <span>이름</span>
-          <input id="employeeName" maxlength="30" autocomplete="name" placeholder="홍길동" required>
-        </label>
-        <label class="field-control">
-          <span>부서</span>
-          <input id="department" maxlength="40" autocomplete="organization-title" placeholder="마케팅팀" required>
-        </label>
-        <button class="button button-dark identity-button" id="identityButton" type="submit">내 신청 확인</button>
-      </form>
-      <p class="microcopy">같은 날짜·이름·부서로 저장하면 기존 신청 내용이 수정됩니다.</p>
-    </section>
-
-    <section class="date-switcher-wrap" aria-label="신청 날짜 선택">
-      <div id="dateTabs" class="date-switcher" role="tablist">
-        <button type="button" class="date-tab" disabled><span>어제</span><strong>--</strong></button>
-        <button type="button" class="date-tab active" disabled><span>오늘</span><strong>--</strong></button>
-        <button type="button" class="date-tab" disabled><span>내일</span><strong>--</strong></button>
-      </div>
-    </section>
-
-    <section id="loadingPanel" class="surface loading-panel">
-      <span class="spinner" aria-hidden="true"></span>
-      <div>
-        <strong>식수 정보를 불러오는 중입니다.</strong>
-        <p>잠시만 기다려주세요.</p>
-      </div>
-    </section>
-
-    <section id="dayArea" class="hidden">
-      <div class="day-heading-row">
-        <div>
-          <p class="kicker" id="relativeLabel">오늘</p>
-          <h2 id="selectedDateTitle">-</h2>
-          <p id="selectedDateDescription">-</p>
-        </div>
-        <span id="submissionBadge" class="status-badge neutral">신청 내역 없음</span>
-      </div>
-
-      <section id="dayAlert" class="inline-alert hidden" role="status"></section>
-
-      <form id="mealForm" novalidate>
-        <div class="meal-card-grid">
-          <article class="meal-panel" id="lunchCard">
-            <div class="meal-panel-head">
-              <div>
-                <span class="meal-symbol lunch-symbol" aria-hidden="true">L</span>
-                <div>
-                  <p class="kicker">LUNCH</p>
-                  <h3>중식</h3>
-                </div>
-              </div>
-              <span id="lunchState" class="status-badge neutral">확인 중</span>
-            </div>
-            <div class="menu-display">
-              <span>오늘의 메뉴</span>
-              <strong id="lunchMenu">-</strong>
-            </div>
-            <div class="meal-meta-row">
-              <span id="lunchDeadline">마감시간 -</span>
-              <span id="lunchCalories" class="calorie-chip hidden">예상 열량 -</span>
-            </div>
-            <div id="lunchCalorieDetail" class="calorie-detail hidden"></div>
-            <fieldset id="lunchChoices" class="choice-segment">
-              <legend class="sr-only">중식 신청 여부</legend>
-              <label>
-                <input type="radio" name="lunch" value="신청">
-                <span>신청</span>
-              </label>
-              <label>
-                <input type="radio" name="lunch" value="미신청">
-                <span>미신청</span>
-              </label>
-            </fieldset>
-          </article>
-
-          <article class="meal-panel" id="dinnerCard">
-            <div class="meal-panel-head">
-              <div>
-                <span class="meal-symbol dinner-symbol" aria-hidden="true">D</span>
-                <div>
-                  <p class="kicker">DINNER</p>
-                  <h3>석식</h3>
-                </div>
-              </div>
-              <span id="dinnerState" class="status-badge neutral">확인 중</span>
-            </div>
-            <div class="menu-display">
-              <span>오늘의 메뉴</span>
-              <strong id="dinnerMenu">-</strong>
-            </div>
-            <div class="meal-meta-row">
-              <span id="dinnerDeadline">마감시간 -</span>
-              <span id="dinnerCalories" class="calorie-chip hidden">예상 열량 -</span>
-            </div>
-            <div id="dinnerCalorieDetail" class="calorie-detail hidden"></div>
-            <fieldset id="dinnerChoices" class="choice-segment">
-              <legend class="sr-only">석식 신청 여부</legend>
-              <label>
-                <input type="radio" name="dinner" value="신청">
-                <span>신청</span>
-              </label>
-              <label>
-                <input type="radio" name="dinner" value="미신청">
-                <span>미신청</span>
-              </label>
-            </fieldset>
-          </article>
-        </div>
-
-        <section id="noticePanel" class="notice-panel hidden">
-          <span aria-hidden="true">i</span>
-          <p id="noticeText"></p>
-        </section>
-
-        <p class="nutrition-note">예상 열량은 표준 1인분 기준이며 실제 조리법과 배식량에 따라 달라질 수 있습니다.</p>
-
-        <div class="save-dock" id="saveDock">
-          <div>
-            <strong id="saveSummary">선택한 날짜의 신청 여부를 확인해주세요.</strong>
-            <span id="formMessage" role="status" aria-live="polite"></span>
-          </div>
-          <button class="button button-primary" id="submitButton" type="submit" disabled>신청 내용 저장</button>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/app.js"></script>
+</form><section aria-labelledby="identityTitle" class="surface identity-surface">
+<div class="surface-heading compact-heading">
+<div>
+<p class="kicker">신청자 정보</p>
+<h2 id="identityTitle">이름과 부서</h2>
+</div>
+<span class="identity-state" id="identityState">정보를 입력해주세요</span>
+</div>
+<form class="identity-form" id="identityForm" novalidate="">
+<label class="field-control">
+<span>이름</span>
+<input autocomplete="name" id="employeeName" maxlength="30" placeholder="홍길동" required=""/>
+</label>
+<label class="field-control">
+<span>부서</span>
+<input autocomplete="organization-title" id="department" maxlength="40" placeholder="마케팅팀" required=""/>
+</label>
+<button class="button button-dark identity-button" id="identityButton" type="submit">내 신청 확인</button>
+</form>
+<p class="microcopy">같은 날짜·이름·부서로 저장하면 기존 신청 내용이 수정됩니다.</p>
+</section><div class="save-dock" id="saveDock">
+<div>
+<strong id="saveSummary">선택한 날짜의 신청 여부를 확인해주세요.</strong>
+<span aria-live="polite" id="formMessage" role="status"></span>
+</div>
+<button class="button button-primary" disabled="" form="mealForm" id="submitButton" type="submit">신청 내용 저장</button>
+</div>
+</section>
+</main>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

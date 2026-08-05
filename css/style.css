@@ -312,3 +312,16 @@ tbody tr:last-child td { border-bottom: 0; }
   .modal-backdrop { padding: 10px; align-items: end; }
   .modal-sheet { max-height: 90vh; padding: 20px 16px; border-radius: 25px 25px 12px 12px; }
 }
+
+/* v3.1 UX adjustments */
+.employee-page #dayArea > .identity-surface {
+  margin-top: 22px;
+  margin-bottom: 0;
+}
+.week-shortcut.active {
+  color: #fff;
+  background: #1d1d1f;
+}
+.week-shortcut.active:hover:not(:disabled) {
+  background: #000;
+}

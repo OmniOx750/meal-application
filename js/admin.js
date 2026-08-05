@@ -37,6 +37,7 @@
     previousWeekButton: document.getElementById('previousWeekButton'),
     nextWeekButton: document.getElementById('nextWeekButton'),
     currentWeekButton: document.getElementById('currentWeekButton'),
+    nextWeekQuickButton: document.getElementById('nextWeekQuickButton'),
     weekRange: document.getElementById('weekRange'),
     weekSettingsBody: document.getElementById('weekSettingsBody'),
     saveWeekButton: document.getElementById('saveWeekButton'),
@@ -74,6 +75,12 @@
   els.nextWeekButton.addEventListener('click', () => moveWeek(7));
   els.currentWeekButton.addEventListener('click', () => {
     els.manageDate.value = todayString();
+    loadWeek();
+  });
+  els.nextWeekQuickButton.addEventListener('click', () => {
+    const nextWeek = parseDate(todayString());
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    els.manageDate.value = dateString(nextWeek);
     loadWeek();
   });
   els.saveWeekButton.addEventListener('click', saveWeek);
@@ -295,6 +302,25 @@
     loadWeek();
   }
 
+
+  function updateWeekShortcutState() {
+    const selectedMonday = weekMondayString(els.manageDate.value || todayString());
+    const currentMonday = weekMondayString(todayString());
+    const nextMondayDate = parseDate(currentMonday);
+    nextMondayDate.setDate(nextMondayDate.getDate() + 7);
+    const nextMonday = dateString(nextMondayDate);
+
+    els.currentWeekButton.classList.toggle('active', selectedMonday === currentMonday);
+    els.nextWeekQuickButton.classList.toggle('active', selectedMonday === nextMonday);
+  }
+
+  function weekMondayString(value) {
+    const date = parseDate(value);
+    const weekday = date.getDay();
+    date.setDate(date.getDate() + (weekday === 0 ? -6 : 1 - weekday));
+    return dateString(date);
+  }
+
   async function loadWeek() {
     if (!state.password) return;
     els.weekSettingsBody.innerHTML = '<div class="surface loading-panel"><span class="spinner"></span><strong>주간 설정을 불러오는 중입니다.</strong></div>';
@@ -311,6 +337,7 @@
         state.selectedDate = state.weekDates.includes(todayString()) ? todayString() : state.weekDates[0];
       }
       els.weekRange.textContent = data.periodLabel || '-';
+      updateWeekShortcutState();
       renderWeek();
       renderSelectedDay();
     } catch (error) {
@@ -490,13 +517,13 @@
       (result.days || []).forEach((day) => state.days.set(day.settings.date, day));
       renderWeek();
       renderSelectedDay();
-      setMessage(els.saveMessage, '이번 주 설정이 저장되었습니다.', 'success');
-      showToast('이번 주 설정이 저장되었습니다.');
+      setMessage(els.saveMessage, '선택한 주 설정이 저장되었습니다.', 'success');
+      showToast('선택한 주 설정이 저장되었습니다.');
       loadDashboard();
     } catch (error) {
       handleAdminError(error, els.saveMessage);
     } finally {
-      setButtonBusy(els.saveWeekButton, false, '이번 주 전체 저장');
+      setButtonBusy(els.saveWeekButton, false, '선택 주 전체 저장');
     }
   }
 
