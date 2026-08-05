@@ -330,3 +330,38 @@ tbody tr:last-child td { border-bottom: 0; }
 .week-shortcut.active:hover:not(:disabled) {
   background: #000;
 }
+
+/* v3.5 dashboard collapse + CSV export */
+.dashboard-content {
+  max-height: 1600px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height .35s ease, opacity .22s ease, transform .35s ease;
+  transform: translateY(0);
+}
+.dashboard-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+.dashboard-toggle-button {
+  min-width: 112px;
+}
+.savebar-actions,
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-content { transition: none; }
+}
+
+@media (max-width: 760px) {
+  .dashboard-toggle-button { width: 100%; }
+  .savebar-actions { width: 100%; flex-direction: column-reverse; }
+  .savebar-actions .button { width: 100%; }
+  .modal-header-actions { align-items: center; }
+}

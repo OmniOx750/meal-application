@@ -8,7 +8,8 @@
     weekDates: [],
     days: new Map(),
     selectedDate: '',
-    loading: false
+    loading: false,
+    dashboardCollapsed: localStorage.getItem('mealDashboardCollapsed') === 'true'
   };
 
   const els = {
@@ -33,6 +34,8 @@
     dashboardAverage: document.getElementById('dashboardAverage'),
     trendChart: document.getElementById('trendChart'),
     dashboardMessage: document.getElementById('dashboardMessage'),
+    dashboardContent: document.getElementById('dashboardContent'),
+    dashboardCollapseButton: document.getElementById('dashboardCollapseButton'),
     manageDate: document.getElementById('manageDate'),
     previousWeekButton: document.getElementById('previousWeekButton'),
     nextWeekButton: document.getElementById('nextWeekButton'),
@@ -41,6 +44,7 @@
     weekRange: document.getElementById('weekRange'),
     weekSettingsBody: document.getElementById('weekSettingsBody'),
     saveWeekButton: document.getElementById('saveWeekButton'),
+    downloadWeekCsvButton: document.getElementById('downloadWeekCsvButton'),
     saveMessage: document.getElementById('saveMessage'),
     selectedDayTitle: document.getElementById('selectedDayTitle'),
     selectedDayMenus: document.getElementById('selectedDayMenus'),
@@ -51,6 +55,7 @@
     openRosterButton: document.getElementById('openRosterButton'),
     rosterModal: document.getElementById('rosterModal'),
     closeRosterButton: document.getElementById('closeRosterButton'),
+    downloadDayCsvButton: document.getElementById('downloadDayCsvButton'),
     rosterTitle: document.getElementById('rosterTitle'),
     rosterSubtitle: document.getElementById('rosterSubtitle'),
     rosterLunchSummary: document.getElementById('rosterLunchSummary'),
@@ -70,6 +75,7 @@
     els.dashboardAnchor.value = todayString();
     loadDashboard();
   });
+  els.dashboardCollapseButton.addEventListener('click', toggleDashboard);
   els.manageDate.addEventListener('change', loadWeek);
   els.previousWeekButton.addEventListener('click', () => moveWeek(-7));
   els.nextWeekButton.addEventListener('click', () => moveWeek(7));
@@ -84,7 +90,9 @@
     loadWeek();
   });
   els.saveWeekButton.addEventListener('click', saveWeek);
+  els.downloadWeekCsvButton.addEventListener('click', downloadSelectedWeekCsv);
   els.openRosterButton.addEventListener('click', openRoster);
+  els.downloadDayCsvButton.addEventListener('click', downloadSelectedDayCsv);
   els.closeRosterButton.addEventListener('click', closeRoster);
   els.rosterModal.addEventListener('click', (event) => {
     if (event.target === els.rosterModal) closeRoster();
@@ -96,6 +104,7 @@
   const today = todayString();
   els.dashboardAnchor.value = today;
   els.manageDate.value = today;
+  applyDashboardCollapsedState();
 
   if (state.password) {
     verifyStoredPassword();
@@ -155,6 +164,19 @@
     } finally {
       setButtonBusy(els.refreshAllButton, false, '전체 새로고침');
     }
+  }
+
+  function toggleDashboard() {
+    state.dashboardCollapsed = !state.dashboardCollapsed;
+    localStorage.setItem('mealDashboardCollapsed', String(state.dashboardCollapsed));
+    applyDashboardCollapsedState();
+  }
+
+  function applyDashboardCollapsedState() {
+    const collapsed = Boolean(state.dashboardCollapsed);
+    els.dashboardContent.classList.toggle('collapsed', collapsed);
+    els.dashboardCollapseButton.textContent = collapsed ? '대시보드 펼치기' : '대시보드 접기';
+    els.dashboardCollapseButton.setAttribute('aria-expanded', String(!collapsed));
   }
 
   function handleDashboardMode(event) {
@@ -624,6 +646,88 @@
   function statusPill(value) {
     const apply = value === '신청';
     return `<span class="table-status ${apply ? 'apply' : 'no'}">${escapeHtml(value || '미선택')}</span>`;
+  }
+
+  function downloadSelectedWeekCsv() {
+    if (!state.weekDates.length) {
+      showToast('주간 데이터를 먼저 불러와주세요.');
+      return;
+    }
+
+    const rows = [];
+    state.weekDates.forEach((date) => {
+      const data = state.days.get(date) || {};
+      const settings = data.settings || defaultSettings(date);
+      const responses = Array.isArray(data.responses) ? data.responses : [];
+      responses.forEach((item) => rows.push(buildCsvRow(date, settings, item)));
+    });
+
+    const startDate = state.weekDates[0];
+    const endDate = state.weekDates[state.weekDates.length - 1];
+    downloadCsv(rows, `식수신청_${startDate}_${endDate}.csv`);
+    showToast(`${formatNumber(rows.length)}건의 신청자 명단을 CSV로 저장했습니다.`);
+  }
+
+  function downloadSelectedDayCsv() {
+    const data = state.days.get(state.selectedDate);
+    if (!data) {
+      showToast('선택한 날짜의 데이터를 찾을 수 없습니다.');
+      return;
+    }
+    const settings = data.settings || defaultSettings(state.selectedDate);
+    const responses = Array.isArray(data.responses) ? data.responses : [];
+    const rows = responses.map((item) => buildCsvRow(state.selectedDate, settings, item));
+    downloadCsv(rows, `식수신청_${state.selectedDate}.csv`);
+    showToast(`${formatNumber(rows.length)}건의 신청자 명단을 CSV로 저장했습니다.`);
+  }
+
+  function buildCsvRow(date, settings, item) {
+    const lunchApplied = item.lunch === '신청';
+    const dinnerApplied = item.dinner === '신청';
+    const lunchPrice = Number(settings.lunchPrice || 0);
+    const dinnerPrice = Number(settings.dinnerPrice || 0);
+    return {
+      '날짜': date,
+      '요일': formatDayTitle(date),
+      '이름': item.name || '',
+      '부서': item.department || '',
+      '중식 신청': item.lunch || '미선택',
+      '석식 신청': item.dinner || '미선택',
+      '중식 메뉴': settings.lunchMenu || '',
+      '석식 메뉴': settings.dinnerMenu || '',
+      '중식 예상 kcal': Number(settings.lunchCalories || 0),
+      '석식 예상 kcal': Number(settings.dinnerCalories || 0),
+      '중식 단가': lunchPrice,
+      '석식 단가': dinnerPrice,
+      '개인 예상 비용': (lunchApplied ? lunchPrice : 0) + (dinnerApplied ? dinnerPrice : 0),
+      '최종 수정': item.updatedAt || ''
+    };
+  }
+
+  function downloadCsv(rows, filename) {
+    const headers = [
+      '날짜', '요일', '이름', '부서', '중식 신청', '석식 신청',
+      '중식 메뉴', '석식 메뉴', '중식 예상 kcal', '석식 예상 kcal',
+      '중식 단가', '석식 단가', '개인 예상 비용', '최종 수정'
+    ];
+    const lines = [headers.map(csvEscape).join(',')];
+    rows.forEach((row) => {
+      lines.push(headers.map((header) => csvEscape(row[header])).join(','));
+    });
+    const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function csvEscape(value) {
+    const text = String(value == null ? '' : value).replace(/\r?\n/g, ' / ');
+    return `"${text.replace(/"/g, '""')}"`;
   }
 
   function handleAdminError(error, messageElement) {
