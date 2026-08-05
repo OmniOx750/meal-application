@@ -155,8 +155,31 @@
 <input autocomplete="name" id="employeeName" maxlength="30" placeholder="홍길동" required=""/>
 </label>
 <label class="field-control">
-<span>부서</span>
-<input autocomplete="organization-title" id="department" maxlength="40" placeholder="마케팅팀" required=""/>
+  <span>부서</span>
+  <select id="department" required>
+    <option value="">부서를 선택하세요</option>
+    <option value="멕아이씨에스">멕아이씨에스</option>
+    <option value="품질검증">품질검증</option>
+    <option value="QA">QA</option>
+    <option value="전략기획">전략기획</option>
+    <option value="인사총무">인사총무</option>
+    <option value="영업관리">영업관리</option>
+    <option value="고객서비스">고객서비스</option>
+    <option value="사업지원">사업지원</option>
+    <option value="해외영업">해외영업</option>
+    <option value="국내영업">국내영업</option>
+    <option value="품질관리">품질관리</option>
+    <option value="생산관리">생산관리</option>
+    <option value="구매자재">구매자재</option>
+    <option value="물류운영">물류운영</option>
+    <option value="연구프로젝트">연구프로젝트</option>
+    <option value="RA">RA</option>
+    <option value="기반연구">기반연구</option>
+    <option value="제품개발">제품개발</option>
+    <option value="연구지원">연구지원</option>
+    <option value="DHC">DHC</option>
+    <option value="재무회계">재무회계</option>
+  </select>
 </label>
 <button class="button button-dark identity-button" id="identityButton" type="submit">내 신청 확인</button>
 </form>
