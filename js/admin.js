@@ -424,16 +424,19 @@
       const menuInput = card.querySelector(`[data-field="${meal}Menu"]`);
       const calorieInput = card.querySelector(`[data-field="${meal}Calories"]`);
       const resultEl = card.querySelector(`[data-role="${meal}CalorieResult"]`);
+      // 기존 열량 데이터가 밥 포함 이전 버전에서 저장된 경우,
+      // 관리자 화면을 여는 즉시 기본 공기밥 300 kcal를 화면값에 반영합니다.
+      if (riceToggle.checked && (menuInput.value.trim() || parseMoney(calorieInput.value) > 0)) {
+        updateRiceCaloriesImmediately(calorieInput, resultEl, true);
+      }
+
       riceToggle.addEventListener('change', () => {
-        if (menuInput.value.trim()) {
-          estimateCalories(card, meal, riceToggle.checked ? '밥 포함 기준으로 다시 계산했습니다.' : '밥 제외 기준으로 다시 계산했습니다.');
-          return;
-        }
-        calorieInput.value = '0';
-        resultEl.dataset.details = '[]';
-        resultEl.textContent = riceToggle.checked
-          ? '메뉴 입력 후 자동 추정을 누르면 공기밥 300 kcal가 포함됩니다.'
-          : '밥 제외 상태입니다. 메뉴 입력 후 자동 추정을 눌러주세요.';
+        // 체크 상태를 바꾸는 즉시 관리자 화면의 예상 kcal에 300을 더하거나 뺍니다.
+        // 메뉴 전체를 다시 분석하고 싶을 때만 '열량 자동 추정' 버튼을 누르면 됩니다.
+        updateRiceCaloriesImmediately(calorieInput, resultEl, riceToggle.checked);
+        showToast(riceToggle.checked
+          ? '공기밥 300 kcal를 즉시 추가했습니다.'
+          : '공기밥 300 kcal를 즉시 제외했습니다.');
       });
     });
     return card;
@@ -653,6 +656,49 @@
 
   function emptyCounts() {
     return { lunchApply: 0, lunchNo: 0, dinnerApply: 0, dinnerNo: 0 };
+  }
+
+
+  function updateRiceCaloriesImmediately(calorieInput, resultEl, includeRice) {
+    let details = safeParseArray(resultEl.dataset.details);
+    let total = parseMoney(calorieInput.value);
+    const riceIndex = details.findIndex(isRiceDetail);
+
+    if (includeRice && riceIndex === -1) {
+      total += 300;
+      details.unshift(defaultRiceDetail());
+    } else if (!includeRice && riceIndex !== -1) {
+      total = Math.max(0, total - Number(details[riceIndex].calories || 300));
+      details.splice(riceIndex, 1);
+    }
+
+    calorieInput.value = formatNumber(total);
+    resultEl.dataset.details = JSON.stringify(details);
+
+    const sideDetails = details.filter((item) => !isRiceDetail(item));
+    const knownSides = sideDetails.filter((item) => Number(item.calories || 0) > 0).length;
+    const unknownSides = sideDetails.filter((item) => !Number(item.calories || 0)).length;
+    resultEl.textContent = `예상 ${formatNumber(total)} kcal · ${includeRice ? '공기밥 300 kcal 포함' : '밥 제외'}` +
+      `${knownSides ? ` · 반찬 ${knownSides}개 인식` : ''}` +
+      `${unknownSides ? ` · 미확인 ${unknownSides}개` : ''}`;
+  }
+
+  function isRiceDetail(item) {
+    if (!item) return false;
+    return item.query === '기본 공기밥' ||
+      item.matchedName === '쌀밥 1공기' ||
+      item.source === '기본 식사 구성';
+  }
+
+  function defaultRiceDetail() {
+    return {
+      query: '기본 공기밥',
+      matchedName: '쌀밥 1공기',
+      calories: 300,
+      serving: '1인분',
+      source: '기본 식사 구성',
+      confidence: '보통'
+    };
   }
 
   function calorieSummary(details, total) {
