@@ -201,24 +201,27 @@
     }
   }
 
-  async function disablePush() {
-    setBusy(true, '알림 해제 중');
-    const token = localStorage.getItem('mealPushToken') || '';
-    try {
-      if (token) await api.post('employee.unregisterPush', { token });
-      const instance = await ensureMessaging();
-      if (token) await instance.deleteToken(token);
-      localStorage.removeItem('mealPushToken');
-      localStorage.removeItem('mealPushName');
-      localStorage.removeItem('mealPushDepartment');
-      setHelp('이 기기의 마감 알림을 해제했습니다.');
-    } catch (error) {
-      setHelp(error.message || '알림 해제 중 오류가 발생했습니다.');
-    } finally {
-      setBusy(false);
-      renderPushState();
+async function disablePush() {
+  setBusy(true, '알림 해제 중');
+  const token = localStorage.getItem('mealPushToken') || '';
+
+  try {
+    if (token) {
+      await api.post('employee.unregisterPush', { token });
     }
+
+    localStorage.removeItem('mealPushToken');
+    localStorage.removeItem('mealPushName');
+    localStorage.removeItem('mealPushDepartment');
+
+    setHelp('이 기기의 마감 알림을 해제했습니다.');
+  } catch (error) {
+    setHelp(error.message || '알림 해제 중 오류가 발생했습니다.');
+  } finally {
+    setBusy(false);
+    renderPushState();
   }
+}
 
   function setBusy(value, label) {
     busy = value;
