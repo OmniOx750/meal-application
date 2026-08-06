@@ -45,7 +45,7 @@
 
     if ('serviceWorker' in navigator) {
       try {
-        serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.2', { scope: './', updateViaCache: 'none' });
+        serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.4', { scope: './', updateViaCache: 'none' });
         await serviceWorkerRegistration.update();
       } catch (error) {
         console.error('서비스 워커 등록 실패', error);
@@ -146,7 +146,7 @@
     if (!window.firebase.apps.length) window.firebase.initializeApp(config.firebaseConfig);
     if (!messaging) messaging = window.firebase.messaging();
     if (!serviceWorkerRegistration) {
-      serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.2', { scope: './', updateViaCache: 'none' });
+      serviceWorkerRegistration = await navigator.serviceWorker.register('./service-worker.js?v=3.7.4', { scope: './', updateViaCache: 'none' });
       await serviceWorkerRegistration.update();
     }
     return messaging;
