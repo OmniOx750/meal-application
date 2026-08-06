@@ -481,7 +481,7 @@
 
   function mealEditorHtml(title, prefix, settings) {
     const menu = settings[`${prefix}Menu`] || '';
-    const deadline = settings[`${prefix}Deadline`] || (prefix === 'lunch' ? '10:00' : '10:00');
+    const deadline = settings[`${prefix}Deadline`] || '10:00';
     const price = settings[`${prefix}Price`] || 0;
     const calories = settings[`${prefix}Calories`] || 0;
     const details = settings[`${prefix}CalorieDetails`] || [];
