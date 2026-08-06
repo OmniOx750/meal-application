@@ -481,7 +481,7 @@
 
   function mealEditorHtml(title, prefix, settings) {
     const menu = settings[`${prefix}Menu`] || '';
-    const deadline = settings[`${prefix}Deadline`] || (prefix === 'lunch' ? '10:30' : '16:30');
+    const deadline = settings[`${prefix}Deadline`] || (prefix === 'lunch' ? '10:00' : '10:00');
     const price = settings[`${prefix}Price`] || 0;
     const calories = settings[`${prefix}Calories`] || 0;
     const details = settings[`${prefix}CalorieDetails`] || [];
@@ -761,7 +761,7 @@
     return {
       date,
       lunchMenu: '', dinnerMenu: '',
-      lunchDeadline: '10:30', dinnerDeadline: '16:30',
+      lunchDeadline: '10:00', dinnerDeadline: '10:00',
       lunchPrice: 0, dinnerPrice: 0,
       lunchCalories: 0, dinnerCalories: 0,
       lunchRiceIncluded: true, dinnerRiceIncluded: true,
