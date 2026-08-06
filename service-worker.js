@@ -2,15 +2,15 @@
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
-const CACHE_NAME = 'mekics-meal-v3-7';
+const CACHE_NAME = 'mekics-meal-v3-7-4';
 const APP_SHELL = [
   './',
   './index.html',
   './css/style.css',
   './js/api.js',
-  './js/app.js?v=3.7.3',
+  './js/app.js?v=3.7.4',
   './js/push-config.js',
-  './js/push.js?v=3.7.3',
+  './js/push.js?v=3.7.4',
   './manifest.webmanifest',
 './icons/icon-192.png',
 './icons/icon-512.png',
